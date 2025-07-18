@@ -16,7 +16,7 @@ import {
   Switch,
   VStack,
 } from "@chakra-ui/react";
-import { IoDocumentAttach, IoPause, IoPlay } from "react-icons/io5";
+import { IoDocumentAttach } from "react-icons/io5";
 import { useMutation, useQuery } from "react-query";
 import { TorrClient } from "../utils/TorrClient";
 import { useMemo, useState } from "react";
@@ -39,16 +39,15 @@ import {
   WindowScroller as _WindowScroller,
   WindowScrollerProps,
 } from "react-virtualized";
+import { SpeedLimitsModeButton } from "../components/buttons/SpeedLimitsModeButton";
+import { PauseAllButton, ResumeAllButton } from "../components/buttons/MutateButton";
+import { SpeedStats } from "../components/SpeedStats";
 
 export const VirtualizedList = _List as unknown as FC<ListProps> & _List;
 export const VirtualizedWindowScroll =
   _WindowScroller as unknown as FC<WindowScrollerProps> & _WindowScroller;
 
 const Home = () => {
-  const { mutate: resumeAll } = useMutation("resumeAll", TorrClient.resumeAll);
-
-  const { mutate: pauseAll } = useMutation("resumeAll", TorrClient.pauseAll);
-
   const [rid, setRid] = useState(0);
 
   const [torrentsTx, setTorrentsTx] = useState<{
@@ -176,7 +175,17 @@ const Home = () => {
     }
 
     return Object.entries(torrentsTx)
-      ?.sort((a, b) => b[1]?.added_on - a[1]?.added_on)
+      ?.sort((a, b) => {
+        if (a[1].amount_left === 0 && b[1].amount_left > 0)
+          return 1
+        if (a[1].amount_left > 0 && b[1].amount_left === 0)
+          return -1
+        const progress_diff = b[1].progress - a[1].progress
+        if (progress_diff === 0) {
+          return a[1]?.name.localeCompare(b[1]?.name)
+        }
+        return progress_diff
+      })
       ?.filter(([hash]) => !removedTorrs.includes(hash))
       ?.filter(([hash, torr]) =>
         filterCategory !== "Show All" ? torr.category === filterCategory : true
@@ -206,7 +215,6 @@ const Home = () => {
             buttonLabel={"Add Torrent"}
             isHomeHeader
           />
-
           <IosBottomSheet title={"Add Torrent"} disclosure={addModalDisclosure}>
             <VStack gap={4}>
               <FormControl isDisabled={!!file}>
@@ -358,23 +366,12 @@ const Home = () => {
             </LightMode>
           </IosBottomSheet>
 
+          <SpeedStats/>
+
           <ButtonGroup my={5} size={"lg"} width={"100%"}>
-            <Button
-              flexGrow={2}
-              leftIcon={<IoPlay />}
-              onClick={() => resumeAll()}
-              variant={"outline"}
-            >
-              {"Start All"}
-            </Button>
-            <Button
-              flexGrow={2}
-              leftIcon={<IoPause />}
-              onClick={() => pauseAll()}
-              variant={"outline"}
-            >
-              {"Pause All"}
-            </Button>
+            <ResumeAllButton flexGrow={3}/>
+            <PauseAllButton flexGrow={3}/>
+            <SpeedLimitsModeButton flexGrow={3}/>
           </ButtonGroup>
 
           <Box bgColor={bgColor} rounded={"lg"} mb={5}>

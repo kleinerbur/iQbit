@@ -83,19 +83,19 @@ export const TorrClient = {
   },
 
   resume: async (hash = "") => {
-    return await APICall.post("torrents/start", `hashes=${hash}`);
+    return await APICall.post("torrents/resume", `hashes=${hash}`);
   },
 
   resumeAll: async () => {
-    return await APICall.post("torrents/start", `hashes=all`);
+    return await APICall.post("torrents/resume", `hashes=all`);
   },
 
   pause: async (hash = "") => {
-    return await APICall.post("torrents/stop", `hashes=${hash}`);
+    return await APICall.post("torrents/pause", `hashes=${hash}`);
   },
 
   pauseAll: async () => {
-    return await APICall.post("torrents/stop", `hashes=all`);
+    return await APICall.post("torrents/pause", `hashes=all`);
   },
 
   remove: async (hash = "", deleteFiles = true) => {
@@ -240,4 +240,24 @@ export const TorrClient = {
     );
     return data;
   },
+
+  getTransferInfo: async () => {
+    const { data } = await APICall.get("transfer/info")
+    return data
+  },
+
+  toggleAlternativeSpeedLimit: async () => {
+  	await APICall.post("transfer/toggleSpeedLimitsMode")
+  },
+
+  getSpeedLimitsMode: async () => {
+    const { data } = await APICall.get("transfer/speedLimitsMode");
+	  return data as boolean;
+  },
+
+  getDownloadLimit: async () => {
+    const { data } = await APICall.get("transfer/downloadLimit");
+    if (!data) return -1
+    else return data as number
+  }
 };

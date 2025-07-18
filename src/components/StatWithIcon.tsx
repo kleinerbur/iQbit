@@ -1,15 +1,17 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { Box, Flex, Spinner, Text, useColorModeValue } from "@chakra-ui/react";
 
 export const StatWithIcon = ({
   icon,
   label,
   lit,
+  litColor,
   loading,
 }: {
   icon: ReactNode;
   label: ReactNode;
   lit?: boolean;
+  litColor?: string;
   loading?: boolean;
 }) => {
   const TextColor = useColorModeValue("grayAlpha.500", "whiteAlpha.500");
@@ -22,7 +24,7 @@ export const StatWithIcon = ({
     >
       <Box
         color={
-          lit ? "blue.500" : lit !== undefined ? "grayAlpha.500" : undefined
+          lit ? (litColor ?? "blue.500") : lit !== undefined ? "grayAlpha.500" : undefined
         }
       >
         {icon}
