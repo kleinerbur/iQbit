@@ -154,7 +154,6 @@ const TorrentInformationContent = ({
               w={"100%"}
               rounded={100}
               size={"xs"}
-              colorScheme={torrentData.progress === 1 ? "green" : "blue"}
               value={100 * torrentData.progress}
             />
           </LightMode>

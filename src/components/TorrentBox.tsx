@@ -45,6 +45,50 @@ import { Input } from "@chakra-ui/input";
 import TorrentInformationContent from "./TorrentInformationContent";
 import { CreateETAString } from "../utils/createETAString";
 
+enum statusColors {
+  ERROR = "red",
+  DOWN = "blue",
+  UP = "green",
+  STALLED = "orange",
+  CHECKING = "yellow",
+  OTHER = "gray"
+}
+
+const stripedStates = [
+  "error",
+  "missingFiles",
+  "pausedUP",
+  "pausedDL",
+  "stoppedUP"
+]
+
+const stateToColorMapping = {
+  "error":        statusColors.ERROR,
+  "missingFiles": statusColors.ERROR,
+
+  "uploading": statusColors.UP,
+  "forcedUP": statusColors.UP,
+  "queuedUP": statusColors.UP,
+  "stalledUP": statusColors.UP,
+    
+  "allocating": statusColors.DOWN,
+  "downloading": statusColors.DOWN,
+  "metaDL": statusColors.DOWN,
+  "queuedDL": statusColors.DOWN,
+  "forcedDL": statusColors.DOWN,
+  "stalledDL": statusColors.DOWN,
+  
+  "checkingUP": statusColors.CHECKING,
+  "checkingDL": statusColors.CHECKING,
+  "checkingResumeData": statusColors.CHECKING,
+  
+  "pausedUP": statusColors.OTHER,
+  "pausedDL": statusColors.OTHER,
+  "stoppedUP": statusColors.OTHER,
+  "moving": statusColors.OTHER,
+  "unknown": statusColors.OTHER,
+}
+
 export interface TorrentBoxProps {
   torrentData: Omit<TorrTorrentInfo, "hash">;
   hash: string;
@@ -303,7 +347,7 @@ const TorrentBox = ({
         </HStack>
         <Flex mt={5} mb={2} justifyContent={"space-between"} alignItems={"end"}>
           <HStack alignItems={"end"}>
-            <Heading color={"blue.500"} size={"lg"}>
+            <Heading color={stateToColorMapping[torrentData.state]+".500"} size={"lg"}>
               {(100 * torrentData.progress).toFixed(0)}%
             </Heading>
             {!isDone && (
@@ -324,8 +368,9 @@ const TorrentBox = ({
           <Progress
             rounded={100}
             size={"sm"}
-            color={"blue.500"}
+            colorScheme={stateToColorMapping[torrentData.state]}
             value={100 * torrentData.progress}
+            hasStripe={stripedStates.includes(torrentData.state)}
           />
         </LightMode>
         <Flex justifyContent={"flex-end"} alignItems={"center"} mt={3}>
@@ -339,6 +384,7 @@ const TorrentBox = ({
                     ? torrentData.num_leechs > 0
                     : false
                 }
+                litColor={stateToColorMapping[torrentData.state]+".500"}
                 icon={
                   isDownloading ? (
                     <IoDownload size={25} />
@@ -356,6 +402,7 @@ const TorrentBox = ({
               />
               <StatWithIcon
                 lit={isDone ? torrentData.upspeed > 0 : torrentData.dlspeed > 0}
+                litColor={stateToColorMapping[torrentData.state]+".500"}
                 icon={<IoSpeedometer />}
                 label={
                   (isPaused
@@ -441,7 +488,7 @@ const TorrentBox = ({
               <LightMode>
                 <Button
                   size={"md"}
-                  colorScheme={"blue"}
+                  colorScheme={stateToColorMapping[torrentData.state]+".500"}
                   onClick={() => resume()}
                   isLoading={waiting === "mainBtn"}
                 >
@@ -452,7 +499,7 @@ const TorrentBox = ({
               <Button
                 size={"md"}
                 variant={"ghost"}
-                color={"blue.500"}
+                color={stateToColorMapping[torrentData.state]+".500"}
                 onClick={() => pause()}
                 isLoading={waiting === "mainBtn"}
               >
