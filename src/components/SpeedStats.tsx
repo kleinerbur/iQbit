@@ -1,4 +1,4 @@
-import { Box, Stat, StatNumber, StatHelpText, StatProps, Flex, Spacer } from '@chakra-ui/react'
+import { Box, Stat, StatNumber, StatHelpText, StatProps, Flex, Spacer, Tooltip } from '@chakra-ui/react'
 import { IoDownload, IoCloudUpload } from 'react-icons/io5'
 import { IconContext } from "react-icons"
 import { TorrClient } from '../utils/TorrClient'
@@ -49,37 +49,53 @@ export function SpeedStats(props: SpeedStatsProps) {
         p={2}
         mt={3}
       >
-        <Flex>
-          <IconContext.Provider value={{ size: '1.5em' }}>
-            <Box color={'blue.500'} margin={'0.4em'} style={{display: 'inline-block', verticalAlign: 'middle'}}>
-              <IoDownload/>
-            </Box>
-          </IconContext.Provider>
-          <Stat>
-            <StatNumber fontSize={'1rem'}>
-              {downSpeed}
-            </StatNumber>
-            <StatHelpText textColor={isSpeedLimited ? 'orange.300' : 'gray.500'}>
-              {`≤ ${downLimit}`}
-            </StatHelpText>
-          </Stat>
-        </Flex>
+        <Tooltip
+          hasArrow
+          placement={'bottom'}
+          label={'Global Download Speed'}
+          fontSize={'md'}
+          openDelay={500}
+          >
+          <Flex>
+            <IconContext.Provider value={{ size: '1.5em' }}>
+              <Box color={'blue.500'} margin={'0.4em'} style={{display: 'inline-block', verticalAlign: 'middle'}}>
+                <IoDownload/>
+              </Box>
+            </IconContext.Provider>
+            <Stat>
+              <StatNumber fontSize={'1rem'}>
+                {downSpeed}
+              </StatNumber>
+              <StatHelpText textColor={isSpeedLimited ? 'orange.300' : 'gray.500'}>
+                {`≤ ${downLimit}`}
+              </StatHelpText>
+            </Stat>
+          </Flex>
+        </Tooltip>
         <Spacer/>
+        <Tooltip
+          hasArrow
+          placement={'bottom'}
+          label={'Global Upload Speed'}
+          fontSize={'md'}
+          openDelay={500}
+        >
         <Flex flexDirection={'row-reverse'}>
-          <IconContext.Provider value={{ size: '1.5em' }}>
-            <Box color={'green.500'} margin={'0.4em'} style={{display: 'inline-block', verticalAlign: 'middle'}}>
-              <IoCloudUpload/>
-            </Box>
-          </IconContext.Provider>
-          <Stat>
-            <StatNumber textAlign={'right'} fontSize={'1rem'}>
-              {upSpeed}
-            </StatNumber>
-            <StatHelpText textAlign={'right'} textColor={isSpeedLimited ? 'orange.300' : 'gray.500'}>
-              {`≤ ${upLimit}`}
-            </StatHelpText>
-          </Stat>
-        </Flex>
+            <IconContext.Provider value={{ size: '1.5em' }}>
+              <Box color={'green.500'} margin={'0.4em'} style={{display: 'inline-block', verticalAlign: 'middle'}}>
+                <IoCloudUpload/>
+              </Box>
+            </IconContext.Provider>
+            <Stat>
+              <StatNumber textAlign={'right'} fontSize={'1rem'}>
+                {upSpeed}
+              </StatNumber>
+              <StatHelpText textAlign={'right'} textColor={isSpeedLimited ? 'orange.300' : 'gray.500'}>
+                {`≤ ${upLimit}`}
+              </StatHelpText>
+            </Stat>
+          </Flex>
+        </Tooltip>
       </Flex>
   </Box>
   )

@@ -314,7 +314,7 @@ const TorrentBox = ({
                 textAlign={"left"}
                 cursor={"pointer"}
                 noOfLines={1}
-                size={"lg"}
+                size={"md"}
                 _hover={{ base: {}, lg: { opacity: 0.7 } }}
               >
                 {torrentData.name}

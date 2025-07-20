@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "react-query"
 import { TorrClient } from "../../utils/TorrClient"
-import { Button, ButtonProps } from "@chakra-ui/react"
+import { Button, ButtonProps, Tooltip } from "@chakra-ui/react"
 import { IoSpeedometer } from "react-icons/io5"
 import { useState } from "react"
 
@@ -29,17 +29,25 @@ export function SpeedLimitsModeButton(props: SpeedLimitsModeButtonProps) {
   })
 
   return (
-    <Button
-      size={"lg"}
-      onClick={async () => {
-        await toggle.mutateAsync()
-      }}
-      variant={props.variant ?? "outline"}
-      colorScheme={isSpeedLimited ? (props.colorSchemeEnabled ?? "orange") : (props.colorSchemeDisabled ?? "gray")}
-      isLoading={toggle.isLoading}
-      {...props}
+    <Tooltip
+      hasArrow
+      placement={'bottom'}
+      label={'Toggle Global Speed Limit'}
+      fontSize={'md'}
+      openDelay={500}
     >
-      <IoSpeedometer/>
-    </Button>
+      <Button
+        size={"lg"}
+        onClick={async () => {
+          await toggle.mutateAsync()
+        }}
+        variant={props.variant ?? "outline"}
+        colorScheme={isSpeedLimited ? (props.colorSchemeEnabled ?? "orange") : (props.colorSchemeDisabled ?? "gray")}
+        isLoading={toggle.isLoading}
+        {...props}
+      >
+        <IoSpeedometer/>
+      </Button>
+    </Tooltip>
   )
 }

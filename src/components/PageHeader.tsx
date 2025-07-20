@@ -1,15 +1,17 @@
 import React from "react";
 import {
   Button,
+  ButtonGroup,
   Flex,
   Heading,
   LightMode,
-  Text,
+  Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
 import { useIsLargeScreen } from "../utils/screenSize";
 import { IoChevronBack } from "react-icons/io5";
+import { ColorModeButton } from "./buttons/ColorModeButton";
 
 export interface PageHeaderProps {
   title: string;
@@ -57,32 +59,34 @@ const PageHeader = (props: PageHeaderProps) => {
           {props.title}
         </Heading>
       </Flex>
-      <LightMode>
-        {props?.onAddButtonClick && (
-          <Button
-            position={"relative"}
-            rounded={"100%"}
-            width={12}
-            height={12}
-            colorScheme={"blue"}
-            onClick={props.onAddButtonClick}
-            role={"group"}
-          >
-            <Text
-              position={"absolute"}
-              right={"110%"}
-              mr={3}
-              color={"blue.500"}
-              fontWeight={"semibold"}
-              opacity={0}
-              _groupHover={{ opacity: isLarge ? 1 : 0 }}
-            >
-              {props?.buttonLabel}
-            </Text>
-            <FaPlus size={40} />
-          </Button>
-        )}
-      </LightMode>
+      {props.isHomeHeader &&
+        <ButtonGroup spacing={5}>
+          <ColorModeButton/>
+          {props?.onAddButtonClick && (
+            <LightMode>
+              <Tooltip
+                hasArrow
+                placement={'bottom'}
+                label={'Add Torrent'}
+                fontSize={'md'}
+                openDelay={500}
+              >
+                <Button
+                  position={"relative"}
+                  rounded={"100%"}
+                  width={12}
+                  height={12}
+                  colorScheme={"blue"}
+                  onClick={props.onAddButtonClick}
+                  role={"group"}
+                >
+                  <FaPlus size={40} />
+                </Button>
+              </Tooltip>
+            </LightMode>
+          )}
+        </ButtonGroup>
+      }
     </Flex>
   );
 };
