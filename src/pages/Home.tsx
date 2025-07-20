@@ -42,6 +42,7 @@ import {
 import { SpeedLimitsModeButton } from "../components/buttons/SpeedLimitsModeButton";
 import { PauseAllButton, ResumeAllButton } from "../components/buttons/MutateButton";
 import { SpeedStats } from "../components/SpeedStats";
+import { AddTorrentDialog } from "../components/AddTorrentDialog";
 
 export const VirtualizedList = _List as unknown as FC<ListProps> & _List;
 export const VirtualizedWindowScroll =
@@ -98,43 +99,6 @@ const Home = () => {
   });
 
   const addModalDisclosure = useDisclosure();
-  const [textArea, setTextArea] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-
-  const [automaticManagment, setAutomaticManagment] = useState(false);
-  const [sequentialDownload, setSequentialDownload] = useState(false);
-  const [firstAndLastPiece, setFirstAndLastPiece] = useState(false);
-
-  const [fileError, setFileError] = useState("");
-  const [file, setFile] = useState<File>();
-  const [draggingOver, setDraggingOver] = useState(false);
-
-  const { data: settings } = useQuery(
-    "settings-mainpage",
-    TorrClient.getSettings,
-    { refetchInterval: 30000 }
-  );
-
-  const validateAndSelectFile = (file: File) => {
-    if (file.name.endsWith(".torrent")) {
-      setFile(file);
-    } else {
-      setFileError("This does not seem to be .torrent file");
-    }
-
-    setDraggingOver(false);
-  };
-
-  const { mutate: attemptAddTorrent, isLoading: attemptAddLoading } =
-    useMutation(
-      "addTorrent",
-      (opts: { autoTmm?: boolean }) =>
-        TorrClient.addTorrent(
-          !!textArea ? "urls" : "torrents",
-          !!textArea ? textArea : file!
-        ),
-      { onSuccess: addModalDisclosure.onClose }
-    );
 
   const isLarge = useIsLargeScreen();
 
@@ -210,161 +174,13 @@ const Home = () => {
       {({ isScrolling, scrollTop, width, height }) => (
         <Flex flexDirection={"column"} width={"100%"} mt={isLarge ? 24 : 0}>
           <PageHeader
-            title={"Downloads"}
+            title={"Transfers"}
             onAddButtonClick={addModalDisclosure.onOpen}
             buttonLabel={"Add Torrent"}
             isHomeHeader
           />
-          <IosBottomSheet title={"Add Torrent"} disclosure={addModalDisclosure}>
-            <VStack gap={4}>
-              <FormControl isDisabled={!!file}>
-                <FormLabel>{"Magnet Link / URL"}</FormLabel>
-                <Textarea
-                  _disabled={{ bgColor: "gray.50" }}
-                  value={textArea}
-                  onChange={(e) => setTextArea(e.target.value)}
-                />
-              </FormControl>
-              <FormControl isDisabled={!!textArea} isInvalid={!!fileError}>
-                <Flex
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                  mb={2}
-                >
-                  <FormLabel mb={0}>{"Add with .torrent file"}</FormLabel>
-                  {file && (
-                    <Button
-                      size={"sm"}
-                      variant={"ghost"}
-                      colorScheme={"blue"}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setFile(undefined);
-                      }}
-                    >
-                      {"Clear"}
-                    </Button>
-                  )}
-                </Flex>
-                <Flex
-                  gap={4}
-                  flexDirection={"column"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  position={"relative"}
-                  borderColor={file ? "green.500" : "blue.500"}
-                  borderWidth={1}
-                  rounded={"lg"}
-                  bgColor={
-                    draggingOver ? "blue.500" : file ? "green.50" : "blue.50"
-                  }
-                  p={4}
-                  color={
-                    draggingOver ? "white" : file ? "green.500" : "blue.500"
-                  }
-                  opacity={!!textArea ? 0.5 : undefined}
-                >
-                  <IoDocumentAttach size={40} />
-                  <Heading size={"sm"} noOfLines={1}>
-                    {draggingOver
-                      ? "Drop it"
-                      : file
-                      ? file.name
-                      : "Click or Drag and Drop"}
-                  </Heading>
-                  <Input
-                    accept={".torrent"}
-                    onDragEnter={() => {
-                      if (!!textArea) return;
-                      setFileError("");
-                      setDraggingOver(true);
-                    }}
-                    onDragLeave={() => setDraggingOver(false)}
-                    onDrop={(e) =>
-                      validateAndSelectFile(e.dataTransfer.files[0])
-                    }
-                    onChange={(e) =>
-                      e?.target?.files &&
-                      validateAndSelectFile(e?.target?.files[0])
-                    }
-                    opacity={0}
-                    _disabled={{ opacity: 0 }}
-                    type={"file"}
-                    position={"absolute"}
-                    top={0}
-                    width={"100%"}
-                    height={"100%"}
-                  />
-                </Flex>
-                <FormErrorMessage>{fileError}</FormErrorMessage>
-              </FormControl>
-              <FormControl display="flex" alignItems="center">
-                <FormLabel htmlFor="automaticManagment" mb="0">
-                  Automatic Managment
-                </FormLabel>
-                <Switch
-                  id="automaticManagment"
-                  isChecked={automaticManagment}
-                  onChange={(e) => {
-                    setAutomaticManagment(e.target.checked);
-                  }}
-                />
-              </FormControl>
-              <FormControl display="flex" alignItems="center">
-                <FormLabel htmlFor="sequentialDownload" mb="0">
-                  Sequential Download
-                </FormLabel>
-                <Switch
-                  id="sequentialDownload"
-                  isChecked={sequentialDownload}
-                  onChange={(e) => {
-                    setSequentialDownload(e.target.checked);
-                  }}
-                />
-              </FormControl>
-              <FormControl display="flex" alignItems="center">
-                <FormLabel htmlFor="firstAndLastPiece" mb="0">
-                  Download first and last piece first
-                </FormLabel>
-                <Switch
-                  id="firstAndLastPiece"
-                  isChecked={firstAndLastPiece}
-                  onChange={(e) => {
-                    setFirstAndLastPiece(e.target.checked);
-                  }}
-                />
-              </FormControl>
-              {Categories.length && (
-                <FormControl>
-                  <FormLabel>{"Category"}</FormLabel>
-                  <Select
-                    placeholder="Select category"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                  >
-                    {Categories.map((c) => (
-                      <option key={c.label}>{c.label}</option>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            </VStack>
-            <LightMode>
-              <Button
-                disabled={!textArea && !file}
-                isLoading={attemptAddLoading}
-                width={"100%"}
-                size={"lg"}
-                colorScheme={"blue"}
-                mt={16}
-                onClick={() =>
-                  attemptAddTorrent({ autoTmm: settings?.auto_tmm_enabled })
-                }
-              >
-                {"Add Torrent"}
-              </Button>
-            </LightMode>
-          </IosBottomSheet>
+
+          <AddTorrentDialog disclosure={addModalDisclosure}/>
 
           <SpeedStats/>
 
