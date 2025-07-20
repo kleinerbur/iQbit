@@ -60,7 +60,7 @@ const DefaultLayout = (props: PropsWithChildren<DefaultLayoutProps>) => {
   const storedTabs = useReadLocalStorage<(PageLabels | "")[]>("tabs");
   const tabsSelected = storedTabs ?? defaultTabs;
 
-  const DownloadsPage = Pages.find((page) => page.label === "Downloads");
+  const TransfersPage = Pages.find((page) => page.label === "Transfers");
   const SettingsPage = Pages.find((page) => page.label === "Settings");
 
   return (
@@ -197,19 +197,19 @@ const DefaultLayout = (props: PropsWithChildren<DefaultLayoutProps>) => {
           borderTop={"1px solid"}
           borderColor={BgBorderColor}
         >
-          {DownloadsPage && (
+          {TransfersPage && (
             <NavButton
-              key={DownloadsPage.url}
+              key={TransfersPage.url}
               {...sharedNavButtonProps}
-              path={DownloadsPage.url}
+              path={TransfersPage.url}
               icon={{
-                active: DownloadsPage.Icon.active({
+                active: TransfersPage.Icon.active({
                   ...activeIconProps,
                   ...iconProps,
                 }),
-                inactive: DownloadsPage.Icon.inactive({ ...iconProps }),
+                inactive: TransfersPage.Icon.inactive({ ...iconProps }),
               }}
-              label={DownloadsPage.label}
+              label={TransfersPage.label}
             />
           )}
           {tabsSelected.map((tab) => {

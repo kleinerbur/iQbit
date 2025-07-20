@@ -3,14 +3,14 @@ import Home from "./pages/Home";
 import {
   IoCog,
   IoCogOutline,
-  IoDownload,
-  IoDownloadOutline,
   IoExtensionPuzzle,
   IoExtensionPuzzleOutline,
   IoPricetags,
   IoPricetagsOutline,
   IoSearch,
   IoSearchOutline,
+  IoSync,
+  IoSyncOutline,
   IoText,
   IoTextOutline,
   IoTrendingUp,
@@ -44,7 +44,7 @@ type PageObject = {
 };
 
 export type PageLabels =
-  | "Downloads"
+  | "Transfers"
   | "Search"
   | "Trending"
   | "Categories"
@@ -55,12 +55,12 @@ export type PageLabels =
 
 export const Pages: PageObject[] = [
   {
-    label: "Downloads",
+    label: "Transfers",
     url: "/",
     component: <Home />,
     Icon: {
-      active: (props) => <IoDownload {...props} />,
-      inactive: (props) => <IoDownloadOutline {...props} />,
+      active: (props) => <IoSync style={{transform: 'scaleX(-1)'}} {...props} />,
+      inactive: (props) => <IoSyncOutline style={{transform: 'scaleX(-1)'}} {...props} />,
     },
     visibleOn: ["bottomNav"],
   },

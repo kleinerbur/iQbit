@@ -42,7 +42,7 @@ export function SpeedLimitsModeButton(props: SpeedLimitsModeButtonProps) {
           await toggle.mutateAsync()
         }}
         variant={props.variant ?? "outline"}
-        colorScheme={isSpeedLimited ? (props.colorSchemeEnabled ?? "orange") : (props.colorSchemeDisabled ?? "gray")}
+        colorScheme={isSpeedLimited ? (props.colorSchemeEnabled ?? "yellow") : (props.colorSchemeDisabled ?? "gray")}
         isLoading={toggle.isLoading}
         {...props}
       >

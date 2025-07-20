@@ -66,7 +66,7 @@ export function SpeedStats(props: SpeedStatsProps) {
               <StatNumber fontSize={'1rem'}>
                 {downSpeed}
               </StatNumber>
-              <StatHelpText textColor={isSpeedLimited ? 'orange.300' : 'gray.500'}>
+              <StatHelpText textColor={isSpeedLimited ? 'yellow.500' : 'gray.500'}>
                 {`≤ ${downLimit}`}
               </StatHelpText>
             </Stat>
@@ -90,13 +90,13 @@ export function SpeedStats(props: SpeedStatsProps) {
               <StatNumber textAlign={'right'} fontSize={'1rem'}>
                 {upSpeed}
               </StatNumber>
-              <StatHelpText textAlign={'right'} textColor={isSpeedLimited ? 'orange.300' : 'gray.500'}>
+              <StatHelpText textAlign={'right'} textColor={isSpeedLimited ? 'yellow.500' : 'gray.500'}>
                 {`≤ ${upLimit}`}
               </StatHelpText>
             </Stat>
           </Flex>
         </Tooltip>
       </Flex>
-  </Box>
+    </Box>
   )
 }
