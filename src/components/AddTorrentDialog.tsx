@@ -8,12 +8,14 @@ import { useMutation, useQuery } from "react-query";
 export function AddTorrentDialog(props: {
   disclosure: UseDisclosureReturn
 }) {
-  const [fileError, setFileError] = useState("");
   const [file, setFile] = useState<File>();
+  
+  const [fileError, setFileError] = useState("");
   const [textArea, setTextArea] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  
   const [draggingOver, setDraggingOver] = useState(false);
-  const [automaticManagement, setAutomaticManagement] = useState(false);
+  const [automaticManagement, setAutomaticManagement] = useState(true);
   const [sequentialDownload, setSequentialDownload] = useState(false);
   const [firstAndLastPiece, setFirstAndLastPiece] = useState(false);
 

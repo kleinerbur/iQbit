@@ -1,35 +1,18 @@
 import PageHeader from "../components/PageHeader";
 import {
-  Box,
-  Button,
   ButtonGroup,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Heading,
-  LightMode,
-  Select,
-  Textarea,
-  useColorModeValue,
   useDisclosure,
-  Switch,
-  VStack,
 } from "@chakra-ui/react";
-import { IoDocumentAttach } from "react-icons/io5";
-import { useMutation, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import { TorrClient } from "../utils/TorrClient";
 import { useMemo, useState } from "react";
 import TorrentBox from "../components/TorrentBox";
 import { TorrTorrentInfo } from "../types";
-import IosBottomSheet from "../components/ios/IosBottomSheet";
-import { Input } from "@chakra-ui/input";
 import { useIsLargeScreen } from "../utils/screenSize";
 import { randomTorrent } from "../data";
 import "react-virtualized/styles.css";
-import { FilterHeading } from "../components/Filters";
-import stateDictionary from "../utils/StateDictionary";
-import { useLocalStorage } from "usehooks-ts";
 import { useFontSizeContext } from "../components/FontSizeProvider"; // only needs to be imported once
 
 import { FC } from "react";
@@ -43,6 +26,8 @@ import { SpeedLimitsModeButton } from "../components/buttons/SpeedLimitsModeButt
 import { PauseAllButton, ResumeAllButton } from "../components/buttons/MutateButton";
 import { SpeedStats } from "../components/SpeedStats";
 import { AddTorrentDialog } from "../components/AddTorrentDialog";
+import { TorrentsFilter, useLocalFilters } from "../components/TorrentsFilter";
+import { IoSadOutline } from "react-icons/io5";
 
 export const VirtualizedList = _List as unknown as FC<ListProps> & _List;
 export const VirtualizedWindowScroll =
@@ -103,35 +88,7 @@ const Home = () => {
   const isLarge = useIsLargeScreen();
 
   const filterDisclosure = useDisclosure();
-  const [filterSearch, setFilterSearch] = useLocalStorage(
-    "home-filter-search",
-    ""
-  );
-  const [filterCategory, setFilterCategory] = useLocalStorage(
-    "home-filter-category",
-    "Show All"
-  );
-  const [filterStatus, setFilterStatus] = useLocalStorage(
-    "home-filter-status",
-    "Show All"
-  );
-
-  const resetFilters = () => {
-    setFilterStatus("Show All");
-    setFilterCategory("Show All");
-    setFilterSearch("");
-  };
-
-  const bgColor = useColorModeValue("white", "gray.900");
-
-  const filterIndicator = useMemo(() => {
-    let indicator = 0;
-    if (filterSearch !== "") indicator++;
-    if (filterStatus !== "Show All") indicator++;
-    if (filterCategory !== "Show All") indicator++;
-
-    return indicator;
-  }, [filterCategory, filterSearch, filterStatus]);
+  const filters = useLocalFilters()
 
   const Torrents = useMemo(() => {
     if (torrentsTx === undefined) {
@@ -152,20 +109,13 @@ const Home = () => {
       })
       ?.filter(([hash]) => !removedTorrs.includes(hash))
       ?.filter(([hash, torr]) =>
-        filterCategory !== "Show All" ? torr.category === filterCategory : true
+        filters.category.value !== "Show All" ? torr.category === filters.category.value : true
       )
       ?.filter(([hash, torr]) =>
-        filterStatus !== "Show All" ? torr.state === filterStatus : true
+        filters.status.value !== "Show All" ? torr.state === filters.status.value : true
       )
-      ?.filter(([hash, torr]) => torr.name.includes(filterSearch));
-  }, [torrentsTx, removedTorrs, filterCategory, filterStatus, filterSearch]);
-
-  const Categories = useMemo(() => {
-    return Object.values(categories || {}).map((c) => ({
-      label: c.name,
-      value: c.name,
-    }));
-  }, [categories]);
+      ?.filter(([hash, torr]) => torr.name.toLowerCase().search(filters.search.value.toLowerCase()) >= 0);
+  }, [torrentsTx, removedTorrs, filters]);
 
   const fontSizeContext = useFontSizeContext();
 
@@ -190,49 +140,7 @@ const Home = () => {
             <SpeedLimitsModeButton flexGrow={3}/>
           </ButtonGroup>
 
-          <Box bgColor={bgColor} rounded={"lg"} mb={5}>
-            <FilterHeading
-              indicator={filterIndicator}
-              disclosure={filterDisclosure}
-            />
-            {filterDisclosure.isOpen && (
-              <Flex flexDirection={"column"} gap={5} px={5} pb={5}>
-                <FormControl>
-                  <FormLabel>Search</FormLabel>
-                  <Input
-                    value={filterSearch}
-                    onChange={(e) => setFilterSearch(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    value={filterCategory}
-                    onChange={(e) => setFilterCategory(e.target.value)}
-                  >
-                    <option>Show All</option>
-                    {Categories.map((cat) => (
-                      <option key={cat.label}>{cat.label}</option>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Status</FormLabel>
-                  <Select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                  >
-                    <option>Show All</option>
-                    {Object.entries(stateDictionary).map(([key, data]) => (
-                      <option key={key} value={key}>
-                        {data.short}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Flex>
-            )}
-          </Box>
+          <TorrentsFilter disclosure={filterDisclosure}/>
 
           <Flex flexDirection={"column"} gap={5}>
             {isLoading &&
@@ -246,14 +154,10 @@ const Home = () => {
                 />
               ))}
 
-            {Torrents.length === 0 && filterIndicator > 0 && (
+            {Torrents.length === 0 && filters.indicator > 0 && (
               <Flex alignItems={"center"} flexDirection={"column"} gap={4}>
-                <Heading size={"md"}>Could not find any results</Heading>
-                <LightMode>
-                  <Button onClick={resetFilters} colorScheme={"blue"}>
-                    Reset Filters
-                  </Button>
-                </LightMode>
+                <IoSadOutline size={'2em'} color={'gray'}/>
+                <Heading size={'md'}>Could not find any results</Heading>
               </Flex>
             )}
 
